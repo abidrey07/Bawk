@@ -1,3 +1,9 @@
+# Bawk
+
+The updated native iOS client, RBT session app, and connected supervisor website are in [bawk-connected](bawk-connected/README.md). Open `bawk-connected/build-check/Bawk.xcodeproj` for iOS and start `bawk-connected/website/server.py` for the supervisor portal.
+
+The earlier web/cloud scaffold is preserved below and in its original folders.
+
 # Social Skills Practice Platform
 
 A web platform helping neurodivergent children (ages 7–15) practice social goals and treatment tasks independently under BCBA supervision.

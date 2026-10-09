@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Bawk supervisor practice planning">
+<title>Bawk · Supervisor</title><link rel="stylesheet" href="./style.css"><script src="./app.js" defer></script><script src="./supervisor.js" defer></script>
+</head>
+<body><div class="shell">
+<header class="site-header"><div class="brand"><span class="brand-mark">🐣</span><span>Bawk</span></div><div id="supervisor-account" class="supervisor-account" hidden>
+<button id="account-toggle" class="account-toggle" type="button" aria-expanded="false" aria-controls="account-menu"><span id="supervisor-avatar" class="avatar"></span><span id="supervisor-name"></span><span aria-hidden="true">⌄</span><span class="sr-only">Profile menu</span></button>
+<div id="account-menu" class="account-menu" hidden><button id="edit-supervisor" type="button">Profile settings</button><button id="sign-out" type="button">Sign out</button></div></div></header>
+<main><div class="page-heading"><div><p class="eyebrow">Supervisor workspace</p><h1 id="greeting">Welcome to Bawk</h1><p class="intro">Set a goal. Write questions. Send practice to your client.</p></div></div>
+<p id="status" role="status" aria-live="polite"></p>
+<section id="account-access" class="panel account-panel" hidden>
+<h2 id="access-title">Sign in to your supervisor account</h2><p class="sample-note">Your account has its own clients and practice history on this Mac.</p>
+<form id="account-form">
+<div id="register-name-row" hidden><label for="register-first-name">First name</label><input id="register-first-name" maxlength="100" autocomplete="given-name"><label for="register-last-name">Last name</label><input id="register-last-name" maxlength="100" autocomplete="family-name"></div>
+<label for="account-email">Email</label><input id="account-email" type="email" required maxlength="254" autocomplete="username">
+<label for="account-password">Password</label><input id="account-password" type="password" required minlength="10" maxlength="128" autocomplete="current-password">
+<p id="register-note" class="sample-note" hidden>Use at least 10 characters. The first account created on this Mac receives the existing clients. Later accounts start with an empty workspace.</p>
+<button id="access-submit" type="submit" class="primary-button">Sign in</button><button id="access-switch" type="button" class="secondary-button">Create an account</button>
+<p id="access-status" role="status"></p></form></section>
+<dialog id="supervisor-settings" aria-labelledby="supervisor-settings-title"><form id="supervisor-profile-form">
+<div class="panel-heading"><h2 id="supervisor-settings-title">Profile settings</h2><button id="close-supervisor-settings" type="button" class="secondary-button" aria-label="Close profile settings">×</button></div>
+<div id="profile-photo-preview" class="avatar avatar-large"></div>
+<label for="supervisor-photo">Profile picture</label><input id="supervisor-photo" type="file" accept="image/jpeg,image/png"><button id="remove-supervisor-photo" type="button" class="secondary-button">Remove photo</button>
+<label for="supervisor-first-name">First name</label><input id="supervisor-first-name" required maxlength="100" autocomplete="given-name"><label for="supervisor-last-name">Last name</label><input id="supervisor-last-name" maxlength="100" autocomplete="family-name"><p class="sample-note">Your greeting uses the entire first-name field, including multiple words. For older accounts, check that your names are in the correct fields.</p>
+<label for="supervisor-email">Email</label><input id="supervisor-email" type="email" readonly>
+<details><summary>Change password</summary><label for="current-password">Current password</label><input id="current-password" type="password" maxlength="128" autocomplete="current-password"><label for="new-password">New password</label><input id="new-password" type="password" minlength="10" maxlength="128" autocomplete="new-password"></details>
+<p id="supervisor-profile-status" role="status"></p><button class="primary-button" type="submit">Save profile</button>
+</form></dialog>
+<div id="supervisor-workspace" class="workspace" hidden><section class="panel clients-panel"><div class="panel-heading"><h2>Clients</h2></div><div id="client-list" class="client-list"></div>
+<form id="new-client"><label for="new-name">New client name</label><input id="new-name" maxlength="100" required autocomplete="off"><button class="primary-button" type="submit">Add client</button></form>
+<section id="client-panel" class="client-profile" hidden aria-labelledby="profile-title">
+<div class="panel-heading"><h2 id="profile-title">Client details</h2><button id="close-details" class="details-close" type="button" aria-label="Close client details">×</button></div>
+<p id="selected-name" class="sample-note"></p>
+<form id="client-details">
+<label for="first-name">First name</label><input id="first-name" name="first_name" maxlength="100" required autocomplete="given-name">
+<label for="last-name">Last name</label><input id="last-name" name="last_name" maxlength="100" autocomplete="family-name">
+<label for="date-of-birth">Date of birth</label><input id="date-of-birth" name="date_of_birth" type="date">
+<label for="caregiver-1">Caregiver 1</label><input id="caregiver-1" name="caregiver_1" maxlength="200">
+<label for="caregiver-2">Caregiver 2</label><input id="caregiver-2" name="caregiver_2" maxlength="200">
+<label for="client-address">Address</label><textarea id="client-address" name="address" maxlength="1000" rows="2" autocomplete="street-address"></textarea>
+<button type="submit" class="secondary-button">Save details</button><p id="profile-status" role="status" class="sample-note"></p>
+</form>
+<button id="delete-client" class="secondary-button danger-button" type="button">Delete client</button>
+<details class="pairing-details"><summary>Connect the app</summary><button id="pair" class="secondary-button" type="button">Pair iOS app</button><p id="pair-info" aria-live="polite" class="sample-note"></p></details>
+</section>
+<details class="pairing-details"><summary>Connect an RBT</summary><form id="rbt-pair-form"><label for="rbt-provider">Provider full name</label><input id="rbt-provider" required maxlength="200"><label for="rbt-credentials">Credentials</label><input id="rbt-credentials" required maxlength="100" placeholder="RBT"><label for="rbt-title">Title</label><input id="rbt-title" required maxlength="100" value="Registered Behavior Technician"><fieldset><legend>Assigned clients</legend><div id="rbt-clients"></div></fieldset><button class="secondary-button" type="submit">Create RBT pairing code</button><p id="rbt-pair-info" class="sample-note" role="status"></p></form></details>
+</section>
+<div class="planning-column">
+<section class="panel goals-panel" id="goals-panel" hidden>
+<div class="panel-heading"><div><p class="eyebrow">Progress over time</p><h2>Goals & independence</h2></div><button id="refresh-goals" class="secondary-button">Refresh</button></div>
+<p class="sample-note">Choose a goal to explore the last seven days of practice.</p>
+<label class="inline-check"><input id="show-archived" type="checkbox"> Show mastered / archived goals</label>
+<div id="goals" class="goal-strip" role="group" aria-label="Client goals"></div>
+<div id="goal-detail" aria-live="polite"></div>
+<details class="add-goal"><summary>Add a goal</summary><form id="new-goal"><label for="new-goal-title">Goal title</label><input id="new-goal-title" required maxlength="4000" placeholder="For example, Recognizing appropriate behavior"><label for="new-goal-description">Goal description (optional)</label><textarea id="new-goal-description" rows="3" maxlength="4000" placeholder="Describe what the client will practice and what success looks like."></textarea><label for="new-goal-mastery">Mastery criteria</label><textarea id="new-goal-mastery" rows="3" maxlength="4000" required placeholder="For example, 80% independent across 3 consecutive sessions and 2 settings."></textarea><button class="secondary-button" type="submit">Add goal</button></form></details>
+</section>
+<section class="panel" id="editor" hidden><div class="panel-heading"><h2>Problem set</h2><button id="new-set" class="secondary-button">New set</button></div>
+<label for="set-title">Problem set title</label><input id="set-title" maxlength="200" placeholder="For example, Asking for help">
+<label for="goal-input">Goal for this problem set</label><select id="goal-input"></select><p class="sample-note">Use one goal for several sets—for example, School, Home, and Community.</p>
+<p class="sample-note">Write your questions below. AI generation and review can be added later.</p>
+<div id="draft-list" class="draft-list"></div><div class="form-bottom"><button id="add-question" class="secondary-button">Add question</button><span id="draft-count">0 questions</span></div>
+<div class="form-bottom"><button id="save" class="secondary-button">Save draft</button><button id="publish" class="primary-button">Save & assign to client</button></div></section>
+<section class="panel" id="sets-panel" hidden><div class="panel-heading"><h2>Saved problem sets</h2><button id="refresh" class="secondary-button">Refresh</button></div><div id="sets"></div></section>
+<section class="panel" id="session-notes-panel" hidden><div class="panel-heading"><h2>RBT session note history</h2><button id="refresh-notes" type="button" class="secondary-button">Refresh</button></div><div id="session-notes"></div></section>
+</div></div></main></div></body></html>
