@@ -4,6 +4,22 @@ import uuid
 
 class FeatureTests(test_bridge.BridgeTests):
     # Only new cases; reuse fixture helpers without repeating inherited cases.
+    def test_rewrite_goal_keeps_identity_assignments_and_archive(self):
+        cid=self.client(); token=self.pair(cid)
+        goal=self.call('goals',{'client_id':cid,'title':'Original goal','description':'Original description','mastery_criteria':'80%'},supervisor=True)[1]
+        draft=self.draft(cid);draft.update(goal_id=goal['id'],publish=True)
+        sid=self.call('sets',draft,supervisor=True)[1]['id']
+        update={**goal,'title':'Next-level goal','description':'Revised description','mastery_criteria':'90% across 3 sessions'}
+        status,result=self.call('goals',update,supervisor=True);self.assertEqual(status,200,result);self.assertEqual(result['id'],goal['id'])
+        active=self.call('client',token=token)[1]['sets'][0];self.assertEqual(active['id'],sid);self.assertEqual(active['goal'],'Next-level goal')
+        stored=self.call('workspace',supervisor=True)[1]['goals'][0];self.assertEqual(stored['description'],'Revised description');self.assertEqual(stored['mastery_criteria'],'90% across 3 sessions')
+        self.assertEqual(self.call('goals',{**update,'title':' '},supervisor=True)[0],400)
+        self.call('goals/archive',{'client_id':cid,'id':goal['id']},supervisor=True)
+        archived=self.call('workspace',supervisor=True)[1]['goals'][0]['archived_at']
+        self.call('goals',{**update,'title':'Reworded archived goal'},supervisor=True)
+        self.assertEqual(self.call('workspace',supervisor=True)[1]['goals'][0]['archived_at'],archived)
+        self.assertEqual(self.call('client',token=token)[1]['sets'],[])
+
     def test_new_lifecycle(self):
         cid=self.client(); other=self.client('Other'); token=self.pair(cid)
         goal=self.call('goals',{'client_id':cid,'title':'Tracing','mastery_criteria':'80% over 3 sessions'},supervisor=True)[1]

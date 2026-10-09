@@ -112,3 +112,6 @@ Run `python3 -m unittest discover -s tests -p 'test_*.py' -v` for API integratio
 Use **Session note history** immediately below the client list to open the dedicated archive page. It includes submitted RBT notes and notes recorded for BCBAs or student analysts. Selecting a client before opening the archive filters it to that client; filters can also show all clients or one author role. Closed cases remain available for historical review.
 
 **Write session note** records the active client, author role/name, session start/end, and narrative. The signed-in supervisor account is retained as the recorder, including when entering a student analyst's note. These are supervisor-managed records, not separate student analyst logins or verified credentials. Submission archives an immutable note; retries do not create duplicates.
+
+
+Select a goal and expand **Edit goal** to rewrite its title, description, and mastery criteria together. Saving retains the goal identity, assigned sets, existing progress, and archive status. Current assignments receive the revised title. Create a new goal when the next level needs separate progress tracking.

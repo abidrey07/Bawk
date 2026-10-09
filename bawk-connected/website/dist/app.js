@@ -234,9 +234,19 @@ function renderGoals(goals) {
   detail.append(element('h3', goal.title, 'goal-title'));
   if (goal.description) detail.append(element('p', goal.description, 'goal-description'));
   detail.append(element('h4', 'Mastery criteria'), element('p', goal.mastery_criteria || 'No mastery criteria entered yet.', 'goal-description'));
-  const masteryEditor = element('details'); masteryEditor.append(element('summary', 'Edit mastery criteria'));
-  const masteryInput = element('textarea'); masteryInput.value = goal.mastery_criteria || ''; masteryInput.maxLength = 4000; masteryInput.setAttribute('aria-label', 'Mastery criteria');
-  masteryEditor.append(masteryInput, button('Save mastery criteria', () => action(async () => { await api('goals', { id: goal.id, client_id: clientId, title: goal.title, description: goal.description || '', mastery_criteria: masteryInput.value }); await refresh(); status('Mastery criteria saved.'); }))); detail.append(masteryEditor);
+  const goalEditor = element('details'); goalEditor.append(element('summary', 'Edit goal'));
+  const editForm = element('form');
+  const titleLabel = element('label', 'Goal title'), titleInput = element('input'); titleInput.value = goal.title; titleInput.required = true; titleInput.maxLength = 4000; titleLabel.append(titleInput);
+  const descriptionLabel = element('label', 'Goal description'), descriptionInput = element('textarea'); descriptionInput.value = goal.description || ''; descriptionInput.maxLength = 4000; descriptionInput.rows = 3; descriptionLabel.append(descriptionInput);
+  const masteryLabel = element('label', 'Mastery criteria'), masteryInput = element('textarea'); masteryInput.value = goal.mastery_criteria || ''; masteryInput.maxLength = 4000; masteryInput.rows = 3; masteryLabel.append(masteryInput);
+  const saveGoal = element('button', 'Save goal', 'secondary-button'); saveGoal.type = 'submit';
+  editForm.append(titleLabel, descriptionLabel, masteryLabel, element('p', 'Rewriting this goal keeps its assigned problem sets and existing progress. Create a new goal if the next level should have separate progress.', 'sample-note'), saveGoal);
+  editForm.onsubmit = e => { e.preventDefault(); action(async () => {
+    if (!titleInput.value.trim()) throw new Error('Enter a goal title.');
+    await api('goals', { id: goal.id, client_id: clientId, title: titleInput.value.trim(), description: descriptionInput.value, mastery_criteria: masteryInput.value });
+    await refresh(); status('Goal title, description, and mastery criteria saved.');
+  }); };
+  goalEditor.append(editForm); detail.append(goalEditor);
   if (goal.archived_at) detail.append(element('p', `Mastered and archived ${new Date(goal.archived_at * 1000).toLocaleDateString()}. Previous results are retained.`, 'sample-note'));
   detail.append(button(goal.archived_at ? 'Restore goal to active practice' : 'Mark mastered & archive', () => changeGoalArchive(goal)));
   const metric = element('div', '', 'goal-metric');

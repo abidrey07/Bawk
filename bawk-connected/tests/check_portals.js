@@ -125,6 +125,15 @@ async function supervisor() {
   vm.runInContext(`selectedGoalId='archived'; render();`,ctx);
   assert(sup.ids.get('goal-detail').children.some(n => n.textContent === 'Restore goal to active practice'));
   assert(!sup.ids.get('goal-detail').children.some(n => n.textContent === 'Add problem set for this goal'));
+  const editor=sup.ids.get('goal-detail').children.find(n=>n.tagName==='details' && n.children[0]?.textContent==='Edit goal');
+  const editForm=editor.children[1];
+  assert.equal(editForm.children[0].children[0].value,'Mastered');
+  editForm.children[0].children[0].value='Next-level goal';
+  editForm.children[1].children[0].value='Updated goal description';
+  editForm.children[2].children[0].value='90% across 4 sessions';
+  editForm.onsubmit({preventDefault(){}});
+  for(let i=0;i<20;i++)await Promise.resolve();
+  assert.deepEqual(calls.filter(c=>c.url==='/api/goals').at(-1).body,{id:'archived',client_id:'demo',title:'Next-level goal',description:'Updated goal description',mastery_criteria:'90% across 4 sessions'});
   ctx.confirm=()=>false; ctx.changeGoalArchive({id:'active',title:'Active'});
   assert.equal(calls.filter(c => c.url === '/api/goals/archive').length, 0);
   ctx.confirm=()=>true; ctx.changeGoalArchive({id:'active',title:'Active'});

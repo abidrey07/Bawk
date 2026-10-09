@@ -675,6 +675,7 @@ class Handler(SimpleHTTPRequestHandler):
                     if body.get('id') and not db.execute('SELECT id FROM goals WHERE id=? AND client_id=? AND deleted_at IS NULL',(gid,cid)).fetchone():
                         return self.reply(404, {'error':'Goal not found.'})
                     db.execute('INSERT INTO goals (id,client_id,title,description,mastery_criteria) VALUES (?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET title=excluded.title,description=excluded.description,mastery_criteria=excluded.mastery_criteria',(gid,cid,title,description,criteria.strip()))
+                    db.execute('UPDATE sets SET goal=? WHERE goal_id=? AND client_id=? AND deleted_at IS NULL AND superseded_by IS NULL', (title,gid,cid))
                     db.commit()
                     return self.reply(200, {'id':gid,'client_id':cid,'title':title,'description':description,'mastery_criteria':criteria.strip()})
                 if path == '/api/sets':
