@@ -25,6 +25,9 @@ changes = {
 for swift in (source/'ios').glob('*.swift'):
     changes['Bawk/'+swift.name] = swift
 changes['website/rbt.py'] = source/'website/rbt.py'
+changes['website/notes.py'] = source/'website/notes.py'
+for note_file in (source/'website/dist').glob('notes.*'):
+    changes['website/dist/'+note_file.name] = note_file
 for parent in (source/'website/dist').glob('parent.*'):
     changes['website/dist/'+parent.name] = parent
 for relative, src in changes.items():

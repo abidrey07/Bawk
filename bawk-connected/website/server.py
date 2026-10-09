@@ -93,6 +93,8 @@ def initialize():
         db.execute('INSERT OR IGNORE INTO seed_rewards SELECT id,client_id,30,1 FROM practice_runs WHERE completed IS NOT NULL')
         from rbt import initialize as initialize_rbt
         initialize_rbt(db)
+        from notes import initialize as initialize_notes
+        initialize_notes(db)
         for old in db.execute("SELECT DISTINCT client_id,set_id FROM attempts WHERE run_id IS NULL").fetchall():
             run = db.execute("SELECT id FROM practice_runs WHERE client_id=? AND set_id=? ORDER BY created DESC LIMIT 1", tuple(old)).fetchone()
             rid = run['id'] if run else str(uuid4())
@@ -349,6 +351,11 @@ class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(ROOT / 'dist'), **kwargs)
 
+    def end_headers(self):
+        if not self.path.startswith('/api/'):
+            self.send_header('Cache-Control', 'no-store')
+        super().end_headers()
+
     def log_message(self, fmt, *args):
         # Do not log response bodies, pairing codes or tokens.
         pass
@@ -452,7 +459,7 @@ class Handler(SimpleHTTPRequestHandler):
     def do_GET(self):
         path = urlparse(self.path).path
         if not path.startswith('/api/'):
-            if path not in ('/', '/index.html', '/app.js', '/supervisor.js', '/style.css', '/parent.html', '/parent.js', '/parent.css'):
+            if path not in ('/', '/index.html', '/app.js', '/supervisor.js', '/style.css', '/parent.html', '/parent.js', '/parent.css', '/notes.html', '/notes.js'):
                 return self.reply(404, {'error': 'Not found'})
             return super().do_GET()
         if path == '/api/session':
@@ -463,6 +470,9 @@ class Handler(SimpleHTTPRequestHandler):
             if path == '/api/rbt/workspace':
                 from rbt import workspace
                 return workspace(self, db)
+            if path == '/api/session-notes':
+                from notes import get_archive
+                return get_archive(self, db)
             if path == '/api/workspace':
                 supervisor = self.supervisor()
                 if not supervisor:
@@ -514,6 +524,9 @@ class Handler(SimpleHTTPRequestHandler):
                 raise ValueError('Invalid request.')
             path = urlparse(self.path).path
             with connect() as db:
+                if path == '/api/session-notes':
+                    from notes import submit_note
+                    return submit_note(self, db, body)
                 if path.startswith('/api/rbt/'):
                     from rbt import post
                     return post(self, db, path, body)

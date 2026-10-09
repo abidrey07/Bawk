@@ -105,3 +105,10 @@ Start session opens a timer and per-goal Independent, Prompted, and No response 
 Practice response data and RBT trial data are displayed separately to avoid conflating independent practice with staff-collected trials. This remains a local prototype; cloud deployment, production identity and access controls, and billing validation are outside this update.
 
 Run `python3 -m unittest discover -s tests -p 'test_*.py' -v` for API integration tests. Additional model checks: `python3 tests/check_shop.py`, `python3 tests/check_tracing.py`, and compile/run `ios/RBTModels.swift` with `tests/RBTNoteChecks.swift`. JavaScript checks use `node tests/check_portals.js`, `node tests/check_goals.js`, and `node tests/check_supervisor.js`.
+
+
+## Session note archive
+
+Use **Session note history** immediately below the client list to open the dedicated archive page. It includes submitted RBT notes and notes recorded for BCBAs or student analysts. Selecting a client before opening the archive filters it to that client; filters can also show all clients or one author role. Closed cases remain available for historical review.
+
+**Write session note** records the active client, author role/name, session start/end, and narrative. The signed-in supervisor account is retained as the recorder, including when entering a student analyst's note. These are supervisor-managed records, not separate student analyst logins or verified credentials. Submission archives an immutable note; retries do not create duplicates.

@@ -82,8 +82,9 @@ function render() {
     more.setAttribute('aria-controls', 'client-panel'); more.setAttribute('aria-expanded', String(detailsOpen && c.id === clientId));
     row.append(b, more); $('client-list').append(row);
   });
+  $('session-history-link').href = '/notes.html' + (clientId ? '?client=' + encodeURIComponent(clientId) : '');
   const client = workspace.clients.find(c => c.id === clientId);
-  ['goals-panel', 'editor', 'sets-panel', 'session-notes-panel'].forEach(id => $(id).hidden = !client);
+  ['goals-panel', 'editor', 'sets-panel'].forEach(id => $(id).hidden = !client);
   $('client-panel').hidden = !client || !detailsOpen;
   renderRbtClients();
   if (!client) return;
@@ -102,7 +103,7 @@ function render() {
   if (!visibleGoals.some(g => g.id === selectedGoalId)) selectedGoalId = visibleGoals[0]?.id || null;
   renderGoals(visibleGoals);
   renderSavedSets(goals);
-  renderSessionNotes();
+
 
 }
 
@@ -293,7 +294,7 @@ function renderGoals(goals) {
 }
 
 $('show-archived').onchange = render;
-$('refresh-notes').onclick = () => action(refresh);
+$('session-history-link').onclick = e => { if (!guardDraft() || (profileDirty && !confirm('Discard unsaved client details?'))) e.preventDefault(); };
 $('delete-client').onclick = () => {
   const client = workspace.clients.find(c => c.id === clientId);
   if (!client || !confirm(`Delete ${client.name} from your client list and disconnect their apps? This ends access to their active case. Historical records will be retained.`)) return;
@@ -317,27 +318,3 @@ $('rbt-pair-form').onsubmit = e => { e.preventDefault(); action(async () => {
   const result = await api('rbt/pair-code', { client_ids, provider_name: $('rbt-provider').value.trim(), credentials: $('rbt-credentials').value.trim(), title: $('rbt-title').value.trim() });
   $('rbt-pair-info').textContent = `RBT pairing code: ${result.code.match(/.{1,4}/g).join('-')} · valid for ${result.expires_minutes || 10} minutes. Enter this in the RBT app with this server’s address.`;
 }); };
-function renderSessionNotes() {
-  const container = $('session-notes'); container.replaceChildren();
-  const notes = (workspace.session_notes || []).filter(note => note.client_id === clientId).sort((a, b) => (b.started_at || b.created || 0) - (a.started_at || a.created || 0));
-  if (!notes.length) { container.append(element('p', 'Submitted RBT notes will appear here after a session ends.', 'empty-state')); return; }
-  notes.forEach(note => {
-    const card = element('details', '', 'session-note');
-    const date = new Date((note.started_at || note.created) * 1000);
-    card.append(element('summary', `${date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })} · ${note.provider_name || 'RBT session'}`));
-    const body = element('div', '', 'session-note-body');
-    const end = new Date(note.ended_at * 1000);
-    const hours = Math.round(Math.max(0, note.ended_at - note.started_at) / 900) / 4;
-    body.append(element('p', `${date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}–${end.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })} · ${hours} hour${hours === 1 ? '' : 's'} · ${hours * 4} quarter-hour unit${hours * 4 === 1 ? '' : 's'}`, 'sample-note'));
-    const counts = note.counts || [];
-    if (counts.length) {
-      const table = element('table', '', 'session-data'), head = element('thead'), headRow = element('tr');
-      ['Goal', 'Independent', 'Prompted', 'No response', 'Independence'].forEach(title => { const th = element('th', title); th.scope = 'col'; headRow.append(th); });
-      head.append(headRow); table.append(head); const tableBody = element('tbody');
-      counts.forEach(count => { const total = count.independent + count.prompted + count.no_response; const row = element('tr'); row.append(element('th', count.goal_title || 'Goal'), element('td', String(count.independent)), element('td', String(count.prompted)), element('td', String(count.no_response)), element('td', total ? `${Math.round(count.independent / total * 1000) / 10}%` : 'No trials')); tableBody.append(row); });
-      table.append(tableBody); const scroll = element('div', '', 'session-data-wrap'); scroll.append(table); body.append(scroll);
-    }
-    body.append(element('p', 'RBT observations are recorded separately from in-app practice results.', 'sample-note'), element('p', note.note_text || 'No note text available.', 'session-note-text'));
-    card.append(body); container.append(card);
-  });
-}

@@ -40,6 +40,7 @@ class FeatureTests(test_bridge.BridgeTests):
         self.assertEqual(self.call('rbt/submit',saved,token=rbt)[1]['ended_at'],submitted['ended_at'])
         self.assertEqual(self.call('rbt/save',saved,token=rbt)[0],409)
         notes=self.call('workspace',supervisor=True)[1]['session_notes'];self.assertEqual(len(notes),1);self.assertEqual(notes[0]['note_text'],saved['note_text'])
+        unified=self.call('session-notes',supervisor=True)[1]['session_notes'];self.assertEqual(unified[0]['author_role'],'RBT');self.assertEqual(unified[0]['id'],submitted['id'])
         active=self.call('rbt/start',{'client_id':cid,'request_id':str(uuid.uuid4())},token=rbt);self.assertEqual(active[0],200)
         self.assertEqual(self.call('clients/delete',{'client_id':cid},supervisor=True)[0],200)
         self.assertEqual(self.call('client',token=token)[0],401)

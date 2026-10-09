@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Session note archives · Bawk</title><link rel="stylesheet" href="/style.css"><script src="/notes.js" defer></script></head>
+<body><div class="shell"><header class="site-header"><a class="brand" href="/" aria-label="Bawk supervisor home"><span class="brand-mark">🐣</span>Bawk</a><a href="/" class="secondary-button">Back to clients</a></header>
+<main><div class="page-heading"><div><p class="eyebrow">Session documentation</p><h1>Session note archives</h1><p class="intro">RBT, BCBA, and student analyst notes in one place.</p></div></div>
+<p id="archive-status" role="status" aria-live="polite">Loading session notes…</p><p id="archive-login" hidden><a href="/">Sign in to your supervisor account</a> to view session notes.</p>
+<div id="archive-workspace" hidden>
+<section class="panel archive-toolbar" aria-label="Filter session notes"><div><label for="archive-client">Client</label><select id="archive-client"><option value="">All clients</option></select></div><div><label for="archive-role">Author role</label><select id="archive-role"><option value="">All roles</option><option>RBT</option><option>BCBA</option><option>Student analyst</option></select></div><button id="archive-refresh" class="secondary-button">Refresh</button><button id="new-note" class="primary-button">Write session note</button></section>
+<p id="archive-count" class="sample-note" aria-live="polite"></p><div id="archive-list"></div>
+</div>
+<dialog id="note-dialog" aria-labelledby="note-title"><form id="staff-note-form"><div class="panel-heading"><h2 id="note-title">Write session note</h2><button type="button" id="note-cancel" class="secondary-button">Cancel</button></div><p class="sample-note">Record a BCBA or student analyst note. Submitted notes are archived as read-only records.</p><p id="note-recorder" class="sample-note"></p>
+<label for="note-client">Client</label><select id="note-client" required></select><label for="note-role">Author role</label><select id="note-role" required><option>BCBA</option><option>Student analyst</option></select><label for="note-author">Author full name</label><input id="note-author" maxlength="200" required autocomplete="name">
+<div class="note-time-fields"><div><label for="note-start">Session start</label><input id="note-start" type="datetime-local" required></div><div><label for="note-end">Session end</label><input id="note-end" type="datetime-local" required></div></div>
+<label for="note-body">Session note</label><textarea id="note-body" rows="10" maxlength="60000" required placeholder="Document goals worked on, observations, data, supervision, and next steps."></textarea><p id="note-status" role="status"></p><button id="note-submit" class="primary-button" type="submit">Submit & archive note</button></form></dialog>
+</main></div></body></html>

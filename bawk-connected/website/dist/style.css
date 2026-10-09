@@ -160,3 +160,19 @@ fieldset { border:1px solid #dfc9a6; border-radius:10px; margin:12px 0; }
 .session-data-wrap { overflow-x:auto; }
 .session-data { width:100%; border-collapse:collapse; margin:14px 0; font-size:.85rem; }
 .session-data th, .session-data td { text-align:left; padding:9px 6px; border-bottom:1px solid #ebd9bd; }
+
+.archive-link { display:block; margin:18px 0; padding:15px; border-radius:12px; background:#ffe8ba; color:#783113; font-weight:750; text-decoration:none; border:1px solid #dfb981; }
+.archive-link span { display:block; margin-top:5px; font-size:.78rem; font-weight:400; }
+.archive-link:hover { background:#ffdfa2; }
+a.brand { text-decoration:none; }
+a.secondary-button { text-decoration:none; }
+.archive-toolbar { display:flex; align-items:end; flex-wrap:wrap; gap:16px; }
+.archive-toolbar > div { flex:1; min-width:180px; }
+.archive-toolbar select { margin-bottom:0; }
+.note-role { display:inline-block; padding:5px 9px; border-radius:20px; background:#fff0d1; color:#783113; font-size:.8rem; margin-right:12px; }
+.note-meta { display:block; margin:9px 0 0; color:#765c3c; font-size:.9rem; }
+#note-dialog { width:min(740px,calc(100% - 32px)); max-height:90vh; overflow:auto; }
+.note-time-fields { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media(max-width:560px) { .note-time-fields { grid-template-columns:1fr; } .archive-toolbar > button { width:100%; } }
+#note-dialog { border:1px solid #dfc9a6; border-radius:20px; background:#fffdf8; color:#382816; padding:24px; box-shadow:0 24px 80px #38281633; }
+#note-dialog::backdrop { background:#38281666; }

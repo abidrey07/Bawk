@@ -137,20 +137,34 @@ async function supervisor() {
   assert.equal(templatePicker.children.length, 4);
   templatePicker.value='star'; templatePicker.onchange();
   assert.equal(vm.runInContext('problems[0].trace_template',ctx), 'star');
-  vm.runInContext(`workspace.session_notes=[{id:'note',client_id:'demo',started_at:1700000000,ended_at:1700003600,provider_name:'Casey RBT',note_text:'Session narrative',counts:[{goal_id:'g',goal_title:'Social',independent:3,prompted:1,no_response:0}]}];renderSessionNotes();`,ctx);
-  const noteCard=sup.ids.get('session-notes').children[0];
-  assert.match(noteCard.children[0].textContent,/Casey RBT/);
-  assert(noteCard.children[1].children.some(n => n.textContent === 'Session narrative'));
-  const countTable=noteCard.children[1].children.find(n => n.className === 'session-data-wrap').children[0];
-  assert.equal(countTable.children[1].children[0].children[4].textContent, '75%');
+  assert.equal(sup.ids.get('session-history-link').href, '/notes.html?client=demo');
   ctx.confirm=()=>false; sup.ids.get('delete-client').onclick();
   assert.equal(calls.filter(c => c.url === '/api/clients/delete').length,0);
   ctx.confirm=()=>true; sup.ids.get('delete-client').onclick();
   for(let i=0;i<20;i++)await Promise.resolve();
   assert.deepEqual(calls.find(c=>c.url==='/api/clients/delete').body,{client_id:'demo'});
   assert.equal(vm.runInContext('clientId',ctx), null);
-  console.log('PASS: mastery criteria, archive visibility and submission, tracing templates, RBT session history counts, client deletion confirmation.');
+  console.log('PASS: mastery criteria, archive visibility and submission, tracing templates, session archive navigation, client deletion confirmation.');
   console.log('PASS: goal disclosure groups, deleted/superseded filtering, empty goals, deletion cancellation, separate delete actions and editor reset.');
   console.log('PASS: parent navigation, goal switching and chart data; supervisor details open/save/close, optional fields and unsaved-edit preservation; seven connected daily dots, zero placeholders, hover/focus tooltips and weighted aggregate.');
 }
 supervisor().catch(e=>{console.error(e);process.exitCode=1;});
+
+async function archiveChecks() {
+  const page=fixture('notes');
+  const base={client_id:'a',client_name:'Avery',started_at:1700000000,ended_at:1700003600,provider_name:'Casey',note_text:'<script>not executable</script>',counts:[]};
+  const data={supervisor:{first_name:'Taylor',last_name:'Lee'},clients:[{id:'a',name:'Avery'},{id:'b',name:'Blake'}],session_notes:[{...base,id:'1',author_role:'RBT',counts:[{goal_title:'Social',independent:3,prompted:1,no_response:0}]},{...base,id:'2',author_role:'BCBA'},{...base,id:'3',author_role:'Student analyst',client_id:'b'}]};
+  const ctx={document:page.document,window:{addEventListener(){}},location:{search:'?client=a'},URLSearchParams,Date,console,crypto:{randomUUID:()=> 'request'},confirm:()=>true,fetch:async()=>({ok:true,status:200,json:async()=>data})};
+  vm.createContext(ctx);vm.runInContext(fs.readFileSync(path.join(__dirname,'../website/dist/notes.js'),'utf8'),ctx);
+  for(let i=0;i<20;i++)await Promise.resolve();
+  assert.equal(page.ids.get('archive-list').children.length,2);
+  page.ids.get('archive-role').value='BCBA';page.ids.get('archive-role').onchange();assert.equal(page.ids.get('archive-list').children.length,1);
+  page.ids.get('archive-role').value='Student analyst';page.ids.get('archive-role').onchange();assert.equal(page.ids.get('archive-count').textContent,'0 archived notes');
+  page.ids.get('archive-client').value='';page.ids.get('archive-client').onchange();assert.equal(page.ids.get('archive-count').textContent,'1 archived note');
+  const note=page.ids.get('archive-list').children[0];assert.equal(note.children[1].children.at(-1).textContent,'<script>not executable</script>');
+  page.ids.get('archive-role').value='RBT';page.ids.get('archive-role').onchange();
+  const table=page.ids.get('archive-list').children[0].children[1].children.find(n=>n.className==='session-data-wrap').children[0];
+  assert.equal(table.children[1].children[0].children[4].textContent,'75%');
+  console.log('PASS: dedicated archive client/role filters, RBT counts, and safe note text.');
+}
+archiveChecks().catch(e=>{console.error(e);process.exitCode=1;});
