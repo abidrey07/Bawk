@@ -382,6 +382,7 @@ struct AssignedPracticeView: View {
 }
 
 struct ContentView: View {
+    var onSwitchView: (() -> Void)? = nil
     @StateObject private var store = PracticeStore()
     @Environment(\.scenePhase) private var scenePhase
     @State private var showConnection = false
@@ -410,6 +411,8 @@ struct ContentView: View {
             HStack {
                 Button(store.paired ? "Connection" : "Connect to supervisor") { showConnection = true }
                 if store.paired { Button(store.loading ? "Loading…" : "Refresh") { Task { await store.refresh() } }.disabled(store.loading) }
+                // Temporary navigation shortcut while testing client and RBT flows.
+                if let onSwitchView { Button("Switch view", action: onSwitchView) }
             }.font(.footnote).padding().frame(maxWidth: .infinity).background(BawkPalette.cream)
                 .tint(BawkPalette.orange)
         }

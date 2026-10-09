@@ -4,7 +4,7 @@ struct BawkRoleView: View {
     @State private var role: String?
     var body: some View {
         Group {
-            if role == "client" { ContentView().overlay(alignment: .topLeading) { Button { role = nil } label: { Image(systemName: "person.crop.circle.badge.arrowshape.backward").padding(10).background(.regularMaterial, in: Circle()) }.accessibilityLabel("Switch role").padding(.leading, 12) } }
+            if role == "client" { ContentView(onSwitchView: { role = nil }) }
             else if role == "rbt" { RBTView(onExit: { role = nil }) }
             else {
                 VStack(spacing: 26) {
