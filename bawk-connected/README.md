@@ -20,7 +20,7 @@ Multiple-choice feedback uses the supervisor's answer key; open-ended answers ar
 
 This connects the app and website through a server on this Mac. It is not a cloud deployment. The Mac must remain on, and an iPhone must be on its local network. Pairing codes expire in ten minutes and are single-use. Device tokens are stored in iOS Keychain; only token hashes are stored on the server. The supervisor page is restricted to this Mac, and clients receive no answer keys.
 
-The local bridge uses HTTP and is intended for development with test clients. Before handling real clinical records or remote clients, move the same API behind HTTPS and authenticated supervisor accounts (for example, the shared Supabase architecture in the original GitHub project). An AI key alone does not provide that deployment.
+The local bridge uses HTTP and is intended for development with test clients. Before handling real clinical records or remote clients, deploy the API behind HTTPS with production identity and access controls. An AI key alone does not provide that deployment.
 
 Client data persists in `website/data/bawk.sqlite3` and is excluded from Git. Back up that database to preserve names, sets, and results. The old source files are backed up in `connection-backups` before installation.
 
